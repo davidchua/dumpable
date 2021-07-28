@@ -1,5 +1,6 @@
 require 'active_support'
 require 'active_record'
+require 'active_hash'
 require 'hashie'
 
 module Dumpable
@@ -22,3 +23,4 @@ module Dumpable
 end
 
 ActiveRecord::Base.send :include, Dumpable::ActiveRecordExtensions
+ActiveHash::Base.send :include, Dumpable::ActiveHashExtensions

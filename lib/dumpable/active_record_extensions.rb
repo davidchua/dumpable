@@ -1,4 +1,16 @@
 module Dumpable
+  module ActiveHashExtensions
+    extend ActiveSupport::Concern
+    module ClassMethods
+      def dump_associations
+        return []
+      end
+      def all_associations
+        return []
+      end
+    end
+  end
+
   module ActiveRecordExtensions
     extend ActiveSupport::Concern
 
@@ -13,7 +25,7 @@ module Dumpable
           begin
             return class_name.constantize
           rescue NameError => e
-            puts "Nameerror hit, cannot find Class: #{e.inspect}"
+#            puts "Nameerror hit, cannot find Class: #{e.inspect}"
             self.const_get(class_name.to_sym)
           rescue Exception => e
             raise "Exception getting class_from_name: #{e.inspect}"
@@ -24,7 +36,9 @@ module Dumpable
           root = []
           class_names = self.reflect_on_all_associations.map(&:name) - [:versions]
           self.reflect_on_all_associations.each do |m|
+#          class_names.each do |m|
             begin
+              next if m.name == :versions
               hh = {}
               hh[m.name] = self.get_class_from_name(m.class_name).dump_associations.compact - [:versions]
               root << hh
