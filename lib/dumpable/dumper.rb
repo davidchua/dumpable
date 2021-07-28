@@ -100,11 +100,19 @@ module Dumpable
 
     def dump_value_string_from_helper(dumpable_object,key, value)
           begin
+            if dumpable_object.class.type_for_attribute(key).class == ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Jsonb
+            value = ActiveRecord::Relation::QueryAttribute.new(
+              key,
+              dumpable_object.attributes[key],
+              dumpable_object.class.type_for_attribute(key)
+            )
+            else
             value = ActiveRecord::Relation::QueryAttribute.new(
               key,
               dumpable_object.attributes_before_type_cast[key],
               dumpable_object.class.type_for_attribute(key)
             )
+            end
 
             ActiveRecord::Base.connection.quote(value.value_for_database)
           rescue ActiveRecord::SerializationTypeMismatch => e
